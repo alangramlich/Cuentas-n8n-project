@@ -1,0 +1,3620 @@
+{
+  "name": "Cuentas_V1.2",
+  "nodes": [
+    {
+      "parameters": {
+        "documentType": "image_url",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mistralAi",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        832
+      ],
+      "id": "3cf89b4d-5130-4000-99ec-65504b13b9bd",
+      "name": "Extract text",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "OjoHMkrXy05o4LQr",
+          "name": "Cuentas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -4320,
+        1680
+      ],
+      "id": "d8759736-95ed-43ad-8626-22e1c208f9c8",
+      "name": "Telegram Trigger",
+      "webhookId": "3c92b244-875d-47be-b01d-ccc064e8d9d1",
+      "credentials": {
+        "telegramApi": {
+          "id": "sPF29t7AuWznDUT2",
+          "name": "cuentas_tfm"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.photo[3].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -432,
+        832
+      ],
+      "id": "a6e05ab1-b9f3-43af-b2da-3432a1cdee51",
+      "name": "Get a file",
+      "webhookId": "e98eab73-6b27-45b8-8177-9fe3c0ab7559",
+      "credentials": {
+        "telegramApi": {
+          "id": "sPF29t7AuWznDUT2",
+          "name": "cuentas_tfm"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bca8c39f-2298-4cab-b46b-f45694b273b4",
+                    "leftValue": "={{ !!$('Telegram Trigger').item.json.message.photo }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7af52591-6d12-49b3-a9a5-a6f58e3517ca",
+                    "leftValue": "={{ !!$('Telegram Trigger').item.json.message.voice }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b58d5d39-be41-4368-9930-f74e0f62f625",
+                    "leftValue": "={{ !!$('Telegram Trigger').item.json.message.text }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": false
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1248,
+        1664
+      ],
+      "id": "e01efb6a-88e6-437a-a371-9e59988a051f",
+      "name": "audio//texto//imagen"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -608,
+        1712
+      ],
+      "id": "d80e6376-df41-45a8-b573-04e3b158441c",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "X55EMhkpQFSCVKor",
+          "name": "Cuentas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/bot8373188227:AAH66pVm1jqlCRTg55uPID9D_z9ALwRSHVI/getFile?file_id={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -944,
+        1712
+      ],
+      "id": "050dccb7-d140-4d44-a08a-7e2cd9eeb6d0",
+      "name": "obtener archivo telegram",
+      "notesInFlow": true,
+      "notes": "en este nodo lo que hago es obtener todo el mensaje de telegram en formato json, eso implica que es un objeto que contiene muchas cosas"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/bot8373188227:AAFNhTuL-Tj-A8YZfczNTBn88L0PZApNgVY/{{ $json.result.file_path }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -784,
+        1712
+      ],
+      "id": "1012d1ed-253b-44db-8f93-3f8d0b665ff5",
+      "name": "discriminar al archivo de audio",
+      "notes": "en este nodo, de esas muchas cosas me quedo solo con el audio "
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fac1bf22-892f-4036-b5b3-0bab56b86935",
+              "name": "chatInput",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "17928d26-7490-4ebb-88b1-f4a6a5bfb031",
+              "name": "usuario",
+              "value": "={{ $('usuario').item.json.usuario[0] }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -448,
+        1712
+      ],
+      "id": "3fa81c6c-62ec-47b1-8c11-0c04b431ad77",
+      "name": "chatInput2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0b168746-0473-4911-a87e-cf468dab4574",
+              "name": "chatInput",
+              "value": "={{ $json.pages[0].markdown }}",
+              "type": "string"
+            },
+            {
+              "id": "73ec37b9-76c8-4997-824f-974459be4fd5",
+              "name": "usuario",
+              "value": "={{ $('usuario').item.json.usuario }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        832
+      ],
+      "id": "e64c0c2b-2e37-4849-b225-469bc5d0ee66",
+      "name": "chatInput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        32,
+        1744
+      ],
+      "id": "3ab8e013-048f-4a49-840f-4bcc37dbb711",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9d1b5e72-4ef8-4b47-99bc-5bd0e15a83a3",
+              "leftValue": "={{ $json['productos[0]'].tipo }}",
+              "rightValue": "Gasto",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        2624,
+        816
+      ],
+      "id": "abcf2d9b-4567-4d1a-a677-37c4c76bb8c5",
+      "name": "Gastos"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a14ca2d2-e166-4949-b7c0-33bd9d9d06fa",
+              "leftValue": "={{ $json['productos[0]'].tipo }}",
+              "rightValue": "Ingreso",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        2624,
+        1024
+      ],
+      "id": "f49b3711-2009-41aa-a08e-2262e12c79a3",
+      "name": "Ingresos"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "productos[0]",
+        "include": "selectedOtherFields",
+        "fieldsToInclude": "usuario[0][0]['url contabilidad'], usuario[0][0].chatID",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2032,
+        896
+      ],
+      "id": "17c5d3d1-06d3-4748-86db-0e17251d6889",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        1136
+      ],
+      "id": "562f2c2f-d170-4d06-bcb0-86f31b192662",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "X55EMhkpQFSCVKor",
+          "name": "Cuentas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n    \"producto\": \"PAN DE CAMPO GRANDE\",\n    \"precio\": \"3900\",\n    \"categoria\": \"Comida\"\n  },\n  {\n    \"producto\": \"Zapatillas\",\n    \"precio\": \"4800\",\n    \"categoria\": \"Ropa\"\n  },\n  {\n    \"producto\": \"factura de internet\",\n    \"precio\": \"3000\",\n    \"categoria\": \"Servicio\"\n  }\n]\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        1312
+      ],
+      "id": "ce2b2070-2dac-4a82-a12c-d9b35e4d00a6",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1856,
+        896
+      ],
+      "id": "178585fb-fa24-4cb0-9c2c-8bcd69a6b366",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1GG1DV9kMiKBGA-r5tbyXyeHy3ctftC0vCTfITi3rrRw",
+          "mode": "list",
+          "cachedResultName": "usuarios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GG1DV9kMiKBGA-r5tbyXyeHy3ctftC0vCTfITi3rrRw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "usuarios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GG1DV9kMiKBGA-r5tbyXyeHy3ctftC0vCTfITi3rrRw/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "chatID",
+              "lookupValue": "={{ $json.message.from.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3120,
+        1680
+      ],
+      "id": "8d955fe6-5ed1-44ac-a156-bece4517cfb3",
+      "name": "consultar usuarios",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YsWe9P8PzfJgTwUJ",
+          "name": "alangramlichklein"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "usuario",
+        "include": "allFieldsExcept",
+        "fieldsToExclude": "row_number",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -2816,
+        1680
+      ],
+      "id": "d06c146d-0067-4eac-af38-f30c84a67596",
+      "name": "usuario"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "72cad72c-b405-4c7a-b85e-5424c093b8de",
+              "leftValue": "={{ $json.usuario[0] }}",
+              "rightValue": "={{ $json.usuario[0].chatID }}",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2512,
+        1680
+      ],
+      "id": "c0ec08fc-f551-478b-b82d-9c591f60f994",
+      "name": "usuario existe?"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "output",
+              "renameField": true,
+              "outputFieldName": "productos"
+            },
+            {
+              "fieldToAggregate": "usuario"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        1024
+      ],
+      "id": "1394d5a1-b5b0-48dd-8eb8-675b96546452",
+      "name": "usuario y productos"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "usuario[0]",
+              "renameField": true,
+              "outputFieldName": "usuario"
+            },
+            {
+              "fieldToAggregate": "chatInput"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        1952
+      ],
+      "id": "d50053ad-12d8-4720-bb59-7a48e7074e9f",
+      "name": "usuario y chatInput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fac1bf22-892f-4036-b5b3-0bab56b86935",
+              "name": "chatInput",
+              "value": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "bb35f277-579b-4da5-b623-520a4050cca6",
+              "name": "usuario",
+              "value": "={{ $json.usuario }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -928,
+        1968
+      ],
+      "id": "1ec21b9e-708e-42f7-9e2a-5826aa6260e7",
+      "name": "set"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "usuario"
+            },
+            {
+              "fieldToAggregate": "chatInput"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        1712
+      ],
+      "id": "8f0cf572-748b-4400-9cc2-cd7a69d35291",
+      "name": "usuario y chatInput1"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "usuario[0]",
+              "renameField": true,
+              "outputFieldName": "usuario"
+            },
+            {
+              "fieldToAggregate": "chatInput"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        192,
+        832
+      ],
+      "id": "39202e09-3fd9-4cd2-ad92-0d2428f6cd57",
+      "name": "usuario y chatInput2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('usuario').item.json.usuario[0]['url contabilidad'] }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "contabilidad",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "producto": "={{ $('Gastos').item.json['productos[0]'].producto }}",
+            "gastos": "={{ $json['productos[0]'].precio }}",
+            "categoria": "={{ $('Gastos').item.json['productos[0]'].categoria }}",
+            "ingresos": "0",
+            "fecha": "={{ $json['productos[0]'].fecha }}",
+            "periodo": "={{ $json['productos[0]'].periodo }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "producto",
+              "displayName": "producto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "periodo",
+              "displayName": "periodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ingresos",
+              "displayName": "ingresos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gastos",
+              "displayName": "gastos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Columna 7",
+              "displayName": "Columna 7",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2848,
+        816
+      ],
+      "id": "cf827e8c-2cb7-48ba-98e5-201073ebe946",
+      "name": "Agregar a contabilidad - URL",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bKl98e0XDpN3UVkY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('usuario').item.json.usuario[0]['url contabilidad'] }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "contabilidad",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "producto": "={{ $json['productos[0]'].producto }}",
+            "categoria": "={{ $json['productos[0]'].categoria }}",
+            "fecha": "={{ $json['productos[0]'].fecha }}",
+            "periodo": "={{ $json['productos[0]'].periodo }}",
+            "ingresos": "={{ $json['productos[0]'].precio }}",
+            "gastos": "0"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "producto",
+              "displayName": "producto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "periodo",
+              "displayName": "periodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ingresos",
+              "displayName": "ingresos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gastos",
+              "displayName": "gastos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Columna 7",
+              "displayName": "Columna 7",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2848,
+        1024
+      ],
+      "id": "e084add7-4fe9-488b-964d-a5f7a5eb8979",
+      "name": "Agregar a contabilidad - URL1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YsWe9P8PzfJgTwUJ",
+          "name": "alangramlichklein"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "output",
+              "renameField": true,
+              "outputFieldName": "productos"
+            },
+            {
+              "fieldToAggregate": "usuario"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        624
+      ],
+      "id": "ffc3aa0f-b44c-4970-91b3-e90d63076e00",
+      "name": "usuario y productos1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1GG1DV9kMiKBGA-r5tbyXyeHy3ctftC0vCTfITi3rrRw",
+          "mode": "list",
+          "cachedResultName": "usuarios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GG1DV9kMiKBGA-r5tbyXyeHy3ctftC0vCTfITi3rrRw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "usuarios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GG1DV9kMiKBGA-r5tbyXyeHy3ctftC0vCTfITi3rrRw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3968,
+        608
+      ],
+      "id": "1c45cbf5-1ed7-4f67-92b2-86bd33efd127",
+      "name": "consultar usuarios1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YsWe9P8PzfJgTwUJ",
+          "name": "alangramlichklein"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"nuevo usuario\": \"false\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2416,
+        448
+      ],
+      "id": "ad9d656d-4b57-4141-aac9-cb414d91fbaa",
+      "name": "usuario validado?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6aac8d66-e055-428e-b504-2cd2d279812f",
+              "name": "message.from.id",
+              "value": "={{ $json.message.from.id }}",
+              "type": "number"
+            },
+            {
+              "id": "d64da764-7f3e-4186-a8d7-9ba8d6e2b26b",
+              "name": "usuario validado",
+              "value": "false",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3792,
+        1088
+      ],
+      "id": "bccdf641-f128-4943-8ab1-343aed1611a6",
+      "name": "INI usuario validado false"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2224,
+        576
+      ],
+      "id": "dd6b54ad-b973-4ffd-915c-41c4b6ee0dd7",
+      "name": "Merge5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d37d523b-35b7-4b8d-b197-65f9f1656944",
+              "leftValue": "={{ $json.usuarios.chatID }}",
+              "rightValue": "={{ $json['message.from.id'] }}",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2672,
+        464
+      ],
+      "id": "1d1b54e4-735e-418b-a90a-3dc840ae5833",
+      "name": "valido este usuario?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e2b32d75-b309-48c5-bff0-061f70e4a5b1",
+              "leftValue": "={{ $json[\"nuevo usuario\"].every(v => v === \"true\") }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2160,
+        240
+      ],
+      "id": "5746993e-f0d4-4432-a446-17ffe94993a0",
+      "name": "el usuario fue validado?"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -3504,
+        624
+      ],
+      "id": "2d9fa2d0-ea6c-4a50-9c93-c15978ea8bd6",
+      "name": "Merge6"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "usuarios",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -3792,
+        608
+      ],
+      "id": "aec0ec46-94f5-49f1-b4c7-0b6341ac9962",
+      "name": "usuarios"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ 1 }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -2944,
+        448
+      ],
+      "id": "a67469ac-d5d2-4e29-8b29-2868fdab61d6",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "usuarios",
+        "include": "selectedOtherFields",
+        "fieldsToInclude": "message.from.id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -3328,
+        624
+      ],
+      "id": "ff05a1b4-7b0d-4746-bac8-966bc274b554",
+      "name": "separo cada usuario"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"nuevo usuario\": \"true\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2416,
+        592
+      ],
+      "id": "af5a87e5-df27-447e-af66-2d5c5788cb38",
+      "name": "usuario validado?1"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "nuevo usuario"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -2528,
+        240
+      ],
+      "id": "c104f896-4121-40a4-9956-97d6832dc694",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1856,
+        432
+      ],
+      "id": "95abf4f1-e030-4001-82af-abf6f8818001",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "X55EMhkpQFSCVKor",
+          "name": "Cuentas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1728,
+        368
+      ],
+      "id": "9451a7ec-39b4-4ccb-9f60-c2c73c738256",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', `Aqui debes escribir el mensaje que quieres enviarle al usuario.`, 'string') }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegramTool",
+      "typeVersion": 1.2,
+      "position": [
+        -1600,
+        576
+      ],
+      "id": "f623df46-8a03-41ce-b1ab-7dd18f97c166",
+      "name": "Send a text message in Telegram",
+      "webhookId": "1f29620c-3678-4682-a06f-45332ef13a81",
+      "credentials": {
+        "telegramApi": {
+          "id": "sPF29t7AuWznDUT2",
+          "name": "cuentas_tfm"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1U2aiORJWTrtcvpRnSn8gBCZ6SmCEyNRf",
+          "mode": "list",
+          "cachedResultName": "Cuentas",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1U2aiORJWTrtcvpRnSn8gBCZ6SmCEyNRf"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        96,
+        96
+      ],
+      "id": "17a14285-901e-4153-871e-173420e5fd6c",
+      "name": "crear carpeta",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9gQKonKJJHgfoiiV",
+          "name": "alangramlichklein"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "contabilidad",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "contabilidad"
+            },
+            {
+              "title": "mis categorias"
+            },
+            {
+              "title": "restante"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        192,
+        -48
+      ],
+      "id": "c5ca6c4c-0d90-4daa-bf07-b61430d7ed9b",
+      "name": "Create spreadsheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YsWe9P8PzfJgTwUJ",
+          "name": "alangramlichklein"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.spreadsheetUrl }}",
+          "mode": "url"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('crear carpeta').item.json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        288,
+        144
+      ],
+      "id": "4dacd951-33cb-402a-890a-c603dc4351aa",
+      "name": "Move file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9gQKonKJJHgfoiiV",
+          "name": "alangramlichklein"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e2ce2da-a7fa-40a1-87b6-ba0a1aedebab",
+              "name": "columns",
+              "value": "producto,categoria,fecha,periodo,ingresos,gastos",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        96
+      ],
+      "id": "6e2d08ed-5da2-4644-a93f-4d2e43d1d49a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Split the comma-separated string from $json.rows\nconst headersArray = $json.columns.split(',');\n// Create an object where each key is a header (trimmed) and its value is the header text\nconst headersObject = {};\nheadersArray.forEach(header => {\nconst trimmedHeader = header.trim();\nheadersObject[trimmedHeader] = trimmedHeader;\n});\n// Return the object so that each header becomes a column in the first row of your sheet\nreturn [\n{\njson: headersObject\n}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        96
+      ],
+      "id": "efaf8a88-4af4-4989-abfa-08c0e2ba5385",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "contabilidad",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "producto",
+              "displayName": "producto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "periodo",
+              "displayName": "periodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ingresos",
+              "displayName": "ingresos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gastos",
+              "displayName": "gastos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sub categoria",
+              "displayName": "sub categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        96
+      ],
+      "id": "867ff495-c618-437e-8bbc-24c48285ba1c",
+      "name": "Headers",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bKl98e0XDpN3UVkY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "contabilidad",
+          "mode": "name"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        688,
+        96
+      ],
+      "id": "98d13c4e-bc88-404d-ab08-1f783e6bdd3b",
+      "name": "Delete rows or columns from sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bKl98e0XDpN3UVkY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1GG1DV9kMiKBGA-r5tbyXyeHy3ctftC0vCTfITi3rrRw",
+          "mode": "list",
+          "cachedResultName": "usuarios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GG1DV9kMiKBGA-r5tbyXyeHy3ctftC0vCTfITi3rrRw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "usuarios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GG1DV9kMiKBGA-r5tbyXyeHy3ctftC0vCTfITi3rrRw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatID": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+            "url contabilidad": "={{ $('Create spreadsheet').item.json.spreadsheetUrl }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chatID",
+              "displayName": "chatID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url contabilidad",
+              "displayName": "url contabilidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        784,
+        96
+      ],
+      "id": "83f8d715-45e5-4d1c-be5f-3a48b168bb44",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bKl98e0XDpN3UVkY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.usuario[0]['url contabilidad'] }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "mis categorias",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2240,
+        1584
+      ],
+      "id": "e0f859d9-d351-4f19-91cf-b332313cb64f",
+      "name": "extraer categorias",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YsWe9P8PzfJgTwUJ",
+          "name": "alangramlichklein"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "Categoria"
+            },
+            {
+              "fieldToAggregate": "Descripcion"
+            },
+            {
+              "fieldToAggregate": "Gasto/Ingreso"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1888,
+        1584
+      ],
+      "id": "9f99a69e-d191-45e0-853a-833d1a676c3a",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// INPUT esperado desde Aggregate:\n// { \"Categoria\": [\"Alimentación\", \"Vivienda\", ...],\n//   \"Descripcion\": [\"Compras de supermercado...\", \"Alquiler, expensas...\", ...] }\n\nconst data = items[0].json;\nconst categorias = data.Categoria || [];\nconst descripciones = data.Descripcion || [];\n\nlet pares = [];\nfor (let i = 0; i < categorias.length; i++) {\n  pares.push(`\"${categorias[i]}\": \"${descripciones[i]}\"`);\n}\n\nconst textoPlano = \"{\\n  \" + pares.join(\",\\n  \") + \"\\n}\";\n\nreturn [{\n  json: {\n    textoIA: textoPlano\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1504,
+        1584
+      ],
+      "id": "c368614b-803b-4451-a568-b9e9d6915e31",
+      "name": "Formatear categorias"
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "user",
+            "emailAddress": "={{ $('Aislar el correo').item.json.output.correo }}"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2832,
+        -80
+      ],
+      "id": "1259c52e-1c79-43ca-b65d-175f7ce1f105",
+      "name": "Share file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9gQKonKJJHgfoiiV",
+          "name": "alangramlichklein"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1248,
+        336
+      ],
+      "id": "30b17ae1-78f9-442f-917f-b683eca87ecb",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "FiNF42jSUi95Ec8r",
+          "name": "Recepcionista"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        320
+      ],
+      "id": "6d004a29-1fb7-4d8d-86ce-650eda72a1b0",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "FiNF42jSUi95Ec8r",
+          "name": "Recepcionista"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"correo\": \"alangramlichklein@gmail.com\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -384,
+        320
+      ],
+      "id": "04a3af46-d8dc-40b7-bc18-ef1f3bf13998",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "=##Rol\nEres Cuentas, el bot de Telegram de TheFamilyBot. Tu personalidad es simpática, alegre y enérgica.\n\n##Herramientas\nTelegram Tool: Úsala para comunicarte con el usuario.\n👉 Es OBLIGATORIO enviar exactamente un mensaje con esta herramienta por cada mensaje recibido del usuario.\n\n##Reglas\n\nPrimer mensaje: \"Hola! Gracias por probar a Cuentas!\nPara continuar, ingresa una direccion de correo electronico a la cual se te compartira el Google Sheets donde se cargaran los datos.\"\n\nConfirmación del correo:\n\nCuando el usuario proporcione un correo, respóndele mostrándole el correo recibido y pídele confirmación.\n\nUltimo mensaje: \"Gracias por terminar tu registro! En breve recibiras un google sheets donde se cargaran los datos que envies\"\n\n**SOLO** después de que el usuario confirme que el correo es correcto, genera la siguiente salida:\n\n\"respuesta\": \"si, conozco el correo del usuario. Es alangramlichklein@gmail.com\"\n\n\nAntes de la confirmación: si todavía no tienes el correo del usuario, o si aún no lo confirmó, la salida debe ser:\n\n\"respuesta\": \"aun no conozco el correo del usuario\"\n\n\nComunicación con el usuario: recuerda que el output en JSON no lo ve el usuario. Toda interacción visible debe hacerse siempre mediante la Telegram Tool."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1728,
+        112
+      ],
+      "id": "75ce538b-ecc9-40b0-abd8-ce8207bd37e6",
+      "name": "Pedir correo"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "Eres un asistente conectado en serie a otro asistente. Tu mision es analizar si el agente anterior logro confirmar el correo.\nCuando el agente anterior aun no conozca el correo, debes retornar FALSE.\nCuanto el agente anterior haya conseguido el correo del usuario, debes retornar TRUE."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1248,
+        112
+      ],
+      "id": "c7fac407-bd0e-4483-815c-a9678c73eb74",
+      "name": "Tengo el correo?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a986f3ff-d4f3-4a21-b2c7-a5979d688bcd",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "TRUE",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1024,
+        112
+      ],
+      "id": "de27a993-c036-4b77-bb31-6ca34c028ae5",
+      "name": "Tengo el correo?2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Pedir correo').item.json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Debes analizar el prompt y determinar el correo del usuario. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -528,
+        96
+      ],
+      "id": "310c98ff-32d7-4b81-8859-f8f2c59b563f",
+      "name": "Aislar el correo"
+    },
+    {
+      "parameters": {
+        "content": "## Alta de usuario\n",
+        "height": 720,
+        "width": 2384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "001883ac-aafe-4233-99b6-d484a532909b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Merge').item.json.chatInput[0] }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Eres un agente de extracción de información especializado en comprender mensajes del usuario.\n\nSalida requerida:\nUn array de objetos, cada uno con las claves:\n\n\"producto\": Nombre del ítem tal como aparece en el texto, respetando mayúsculas, minúsculas y acentos, con limpieza mínima: recortar espacios al inicio y final, colapsar espacios múltiples a uno solo y eliminar caracteres no imprimibles.\n\"precio\": Importe total por ítem (no unitario) como string con punto decimal y exactamente dos decimales (e.g., \"3900.00\"), sin símbolos de moneda ni separadores de miles.\n\"categoria\": debes elegir SOLO entre estas opciones: \n{{ $('Formatear categorias').item.json.textoIA }}\n\n\n\n\n\n--------------------------------\nAcepta coma o punto como separador decimal, pero devuelve el numero entero.\nIgnora separadores de miles (puntos, comas, espacios) y símbolos de moneda.\nSi el precio total del ítem está explícito (e.g., “PAN DE CAMPO GRANDE 3900,00”), úsalo.\nSi solo aparece cantidad y precio unitario (e.g., “2 x 1.500”), calcula el total (cantidad × precio unitario) y formatea a dos decimales.\n\n\nNo agrupa ítems repetidos; cada línea de ítem genera una entrada en el array.\nIgnora precios sin nombre de producto asociado.\nSi no se detectan ítems, devuelve [].\n-------------------------------\n\n\n\n\n\nEjemplos:\n---\nEntrada:\n\"hoy sali de compras, compre un pan de campo grande a 3900, zapatillas a 4800 y pague internet 3000\"\n---\nSalida:\n[\n  {\n    \"producto\": \"PAN DE CAMPO GRANDE\",\n    \"precio\": \"3900\",\n    \"categoria\": \"Comida\"\n  },\n  {\n    \"producto\": \"Zapatillas\",\n    \"precio\": \"4800\",\n    \"categoria\": \"Ropa\"\n  },\n  {\n    \"producto\": \"factura de internet\",\n    \"precio\": \"3000\",\n    \"categoria\": \"Servicio\"\n  }\n]\n---\nEntrada:\n\"este mes cobre 50000\"\n---\nSalida:\n  {\n    \"producto\": \"sueldo\",\n    \"precio\": \"3000\",\n    \"categoria\": \"Ingreso\"\n  }"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        864,
+        1008
+      ],
+      "id": "bd24bc3d-977b-418d-964c-b2ec7eab82c1",
+      "name": "Identificar productos"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Eres un agente de extracción de información especializado en tickets y facturas. Tu tarea es identificar los ítems comprados en el texto de entrada y devolverlos como un arreglo JSON.\nSalida requerida:\nUn array de objetos, cada uno con las claves:\n\n\"producto\": Nombre del ítem, respetando mayúsculas, minúsculas y acentos. \n\"precio\": Importe total por ítem (no unitario) como string con punto decimal y exactamente dos decimales (e.g., \"3900.00\"), sin símbolos de moneda ni separadores de miles.\n\"categoria\": debes elegir SOLO entre estas opciones: \n{{ $('Formatear categorias').item.json.textoIA }}\nEXCEPCIONES \nCuando se notifique de un ingreso, tu salida debe tener obligadamente \"sub categoria\": \"INGRESO\". En \"precio\" guardaras la cantidad de dinero cobrado. \"categoria\" puede ser sueldo, extraer del ahorro, etc. Puedes decidir tu una categoria nueva.\nCuando un renglon menciona \"BONIFICACION\" o \"BONIF. %%%\" ingresalo como INGRESO. Si el monto es un valor negativo, conviertelo a positivo. A continuacion un ejemplo de esta excepcion:\n\n\nENTRADA:\nBONIF. C 15% CLUBDIA (10,50) -321,95\n1,0000 x 1740,0000\nBONIF. 0 2X$2900 MIL (21,00) -1740,00\nSALIDA:\n\"producto\": \"bonificacion\"\n\"sub categoria\": \"ingreso\"\n\"precio\": \"321\"\n\"producto\": \"bonificacion\"\n\"sub categoria\": \"ingreso\"\n\"precio\": \"1740\"\n\n\nReglas de extracción:\nAcepta coma o punto como separador decimal, pero devuelve el numero entero.\nIgnora separadores de miles (puntos, comas, espacios) y símbolos de moneda.\nSi el precio total del ítem está explícito (e.g., “PAN DE CAMPO GRANDE 3900,00”), úsalo.\nSi solo aparece cantidad y precio unitario (e.g., “2 x 1.500”), calcula el total (cantidad × precio unitario) y formatea a dos decimales.\n\n\nNo agrupa ítems repetidos; cada línea de ítem genera una entrada en el array.\nIgnora precios sin nombre de producto asociado.\nSi no se detectan ítems, devuelve [].\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        832
+      ],
+      "id": "afb9e1d8-5d5a-459c-bf36-b6eec2c91678",
+      "name": "Identificar productos1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75e541ca-95d2-4d6f-9fe2-0aca2c6b6457",
+              "name": "columns",
+              "value": "Categoria,Descripcion,Gasto/Ingreso",
+              "type": "string"
+            },
+            {
+              "id": "adef07e9-5fec-435f-817e-72ffeef3206b",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        96
+      ],
+      "id": "7a9a2c1d-63f1-4daa-a185-72c73ed2160f",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Split the comma-separated string from $json.rows\nconst headersArray = $json.columns.split(',');\n// Create an object where each key is a header (trimmed) and its value is the header text\nconst headersObject = {};\nheadersArray.forEach(header => {\nconst trimmedHeader = header.trim();\nheadersObject[trimmedHeader] = trimmedHeader;\n});\n// Return the object so that each header becomes a column in the first row of your sheet\nreturn [\n{\njson: headersObject\n}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        96
+      ],
+      "id": "b246eaef-9ff2-49a3-a5bf-87eb66301789",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "mis categorias",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1184,
+        96
+      ],
+      "id": "9f214d03-0da7-4a49-9130-4ad37f983024",
+      "name": "Headers1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bKl98e0XDpN3UVkY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "mis categorias",
+          "mode": "name"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1312,
+        96
+      ],
+      "id": "a3fe0075-e34a-4260-a4ac-b4a3f1c6192d",
+      "name": "Delete rows or columns from sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bKl98e0XDpN3UVkY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ledYxheRYUCTGxL7k0Z1T5Rb0LepjKE3iFoQwphXuOg",
+          "mode": "list",
+          "cachedResultName": "plantilla",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ledYxheRYUCTGxL7k0Z1T5Rb0LepjKE3iFoQwphXuOg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1475720876,
+          "mode": "list",
+          "cachedResultName": "mis categorias",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ledYxheRYUCTGxL7k0Z1T5Rb0LepjKE3iFoQwphXuOg/edit#gid=1475720876"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1472,
+        96
+      ],
+      "id": "0583f251-9bb2-4d65-a767-9ffdad4ffa10",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YsWe9P8PzfJgTwUJ",
+          "name": "alangramlichklein"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetUrl }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "mis categorias",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Categoria": "={{ $json.Categoria }}",
+            "Descripcion": "={{ $json.Descripcion }}",
+            "Gasto/Ingreso": "={{ $json['Gasto/Ingreso'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Categoria",
+              "displayName": "Categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Descripcion",
+              "displayName": "Descripcion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Gasto/Ingreso",
+              "displayName": "Gasto/Ingreso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1616,
+        96
+      ],
+      "id": "30d131d1-53fd-45ff-85e9-12973567c033",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YsWe9P8PzfJgTwUJ",
+          "name": "alangramlichklein"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"respuesta\": \"si, conozco el correo del usuario. Es botelladeplastico@gmail.com\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1392,
+        496
+      ],
+      "id": "4f3f0f8e-5e3f-4c4b-96f5-5d49c36852f7",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2704,
+        -80
+      ],
+      "id": "c1ac9a35-e280-4525-87d7-a297f739954f",
+      "name": "Merge4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// === Lee tabla de verdad desde Aggregate1 ===\nconst agg = $items('Aggregate1', 0, 0)[0].json;\n\n// Convierte columnas a arrays (maneja objetos \"0\",\"1\",... o arrays)\nconst asArr = col => Array.isArray(col) ? col : Object.values(col || {});\nconst categorias = asArr(agg['Categoria']);\nconst tipos = asArr(agg['Gasto/Ingreso']);\n\n// Normalizador (sin acentos, trim, minúsculas)\nconst norm = s => String(s || '')\n  .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')\n  .trim().toLowerCase();\n\n// Diccionario categoria -> \"Gasto\"/\"Ingreso\"\nconst lookup = {};\ncategorias.forEach((c, i) => { lookup[norm(c)] = String(tipos[i] || '').trim(); });\n\n// === Fecha/periodo desde variables de entorno ===\n// Preferimos $today (00:00 UTC del día actual); si no, $now.\nconst base = new Date($today || $now);\nconst months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];\n\n// Usamos getters UTC para evitar corrimientos por zona horaria\nconst dd = String(base.getUTCDate()).padStart(2, '0');\nconst mm = String(base.getUTCMonth() + 1).padStart(2, '0');\nconst yyyy = base.getUTCFullYear();\n\nconst fechaStr = `${dd}/${mm}/${yyyy}`;\nconst periodoStr = `${months[base.getUTCMonth()]} ${yyyy}`;\n\n// === Procesa cada item del Split Out ===\nreturn items.map(it => {\n  // Tus datos están dentro de \"productos[0]\"\n  const row = it.json['productos[0]'] ?? it.json;\n\n  const cat = norm(row.categoria);\n  const tipo = lookup[cat] ?? 'DESCONOCIDO';\n\n  // Guardamos SOLO dentro de productos[0]\n  row.tipo = tipo;\n  row.fecha = fechaStr;\n  row.periodo = periodoStr;\n\n  return it;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        896
+      ],
+      "id": "cadf6b83-17e5-4b6d-87c7-1ba85be42d02",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3920,
+        2224
+      ],
+      "id": "bc660c8b-3345-4e7d-9882-9ccf440c14d7",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('usuario').item.json.usuario[0]['url contabilidad'] }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "restante",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4192,
+        2224
+      ],
+      "id": "3087bdb9-ec3e-4809-b660-45c05da6d49f",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bKl98e0XDpN3UVkY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "=Restante:  {{ $json.restante }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4480,
+        2224
+      ],
+      "id": "7a055483-ca9d-421d-b8da-4b6853ed0f64",
+      "name": "Notificar restante",
+      "webhookId": "07ccefdc-ab71-4758-a420-f62b0b25a04e",
+      "credentials": {
+        "telegramApi": {
+          "id": "sPF29t7AuWznDUT2",
+          "name": "cuentas_tfm"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json['productos[0]'].categoria }} | {{ $json['productos[0]'].producto }} | {{ $json['productos[0]'].precio }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2656,
+        1264
+      ],
+      "id": "f8dee27d-cfb5-4b54-b31b-a4eedd479a99",
+      "name": "Notificar movimientos",
+      "webhookId": "c537d779-4faf-449d-9414-e27182991bea",
+      "credentials": {
+        "telegramApi": {
+          "id": "sPF29t7AuWznDUT2",
+          "name": "cuentas_tfm"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1d44ebe3-c61f-481f-8365-791ac504d3bd",
+              "name": "['productos[0]'].precio",
+              "value": "={{ $json['productos[0]'].precio }}",
+              "type": "number"
+            },
+            {
+              "id": "5d90b436-df63-4f9d-90d2-6c557d9213aa",
+              "name": "['productos[0]'].producto",
+              "value": "={{ $json['productos[0]'].producto }}",
+              "type": "string"
+            },
+            {
+              "id": "d66bd34e-c5ff-43d7-a192-e0af2f5e372e",
+              "name": "['productos[0]'].categoria",
+              "value": "={{ $json['productos[0]'].categoria }}",
+              "type": "string"
+            },
+            {
+              "id": "e217592e-111e-42a3-8dd4-34c175600ccc",
+              "name": "['productos[0]'].tipo",
+              "value": "={{ $json['productos[0]'].tipo }}",
+              "type": "string"
+            },
+            {
+              "id": "4e6f6bd5-36cb-446c-af13-e4d70d03ba3a",
+              "name": "['productos[0]'].fecha",
+              "value": "={{ $json['productos[0]'].fecha }}",
+              "type": "string"
+            },
+            {
+              "id": "39dc51c0-5d60-48ed-9745-5eb09e3360c5",
+              "name": "['productos[0]'].periodo",
+              "value": "={{ $json['productos[0]'].periodo }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2736,
+        1024
+      ],
+      "id": "e7f00a96-9753-43e9-a2db-58094581a831",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1d44ebe3-c61f-481f-8365-791ac504d3bd",
+              "name": "['productos[0]'].precio",
+              "value": "={{ $json['productos[0]'].precio }}",
+              "type": "number"
+            },
+            {
+              "id": "5d90b436-df63-4f9d-90d2-6c557d9213aa",
+              "name": "['productos[0]'].producto",
+              "value": "={{ $json['productos[0]'].producto }}",
+              "type": "string"
+            },
+            {
+              "id": "d66bd34e-c5ff-43d7-a192-e0af2f5e372e",
+              "name": "['productos[0]'].categoria",
+              "value": "={{ $json['productos[0]'].categoria }}",
+              "type": "string"
+            },
+            {
+              "id": "e217592e-111e-42a3-8dd4-34c175600ccc",
+              "name": "['productos[0]'].tipo",
+              "value": "={{ $json['productos[0]'].tipo }}",
+              "type": "string"
+            },
+            {
+              "id": "4e6f6bd5-36cb-446c-af13-e4d70d03ba3a",
+              "name": "['productos[0]'].fecha",
+              "value": "={{ $json['productos[0]'].fecha }}",
+              "type": "string"
+            },
+            {
+              "id": "39dc51c0-5d60-48ed-9745-5eb09e3360c5",
+              "name": "['productos[0]'].periodo",
+              "value": "={{ $json['productos[0]'].periodo }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2736,
+        816
+      ],
+      "id": "f5a08489-6c02-401e-a765-67d03c595e94",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75e541ca-95d2-4d6f-9fe2-0aca2c6b6457",
+              "name": "columns",
+              "value": "restante",
+              "type": "string"
+            },
+            {
+              "id": "adef07e9-5fec-435f-817e-72ffeef3206b",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1920,
+        96
+      ],
+      "id": "225ec68d-2f8b-45c4-b009-79e2bf2045f3",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "restante",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "columns",
+              "displayName": "columns",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2080,
+        96
+      ],
+      "id": "523c1811-ada1-4c57-8feb-2888ab27360d",
+      "name": "Headers2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bKl98e0XDpN3UVkY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "restante",
+          "mode": "name"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2240,
+        96
+      ],
+      "id": "2ca562b0-d4ac-4dc6-8ed0-9e5a8f50c96c",
+      "name": "Delete rows or columns from sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bKl98e0XDpN3UVkY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "restante",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "columns": "==(SUMA(contabilidad!E:E)-SUMA(contabilidad!F:F))"
+          },
+          "matchingColumns": [
+            "columns"
+          ],
+          "schema": [
+            {
+              "id": "columns",
+              "displayName": "columns",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2448,
+        96
+      ],
+      "id": "1904d39b-ffe9-4a30-9ce1-ad16190f5374",
+      "name": "Append row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bKl98e0XDpN3UVkY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1744,
+        96
+      ],
+      "id": "98e1b738-55b2-46a6-b37e-7782211bf7ff",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput[0] }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Estas encargado de identificar la intencion del usuario en su mensaje. Las opciones son las siguientes:\n--------------------------------------------------------\nCASOS:\n--------------------------------\n1. Notificar un gasto o ingreso:\nEn este caso, el usuario desea notificar un gasto o ingreso. Te daras cuenta porque su mensaje contiene productos y precios. Ejemplo:\n\"pan de campo 5000 gaseosa 13000\"\n--------------------------------\n2. Consultar dinero restante:\nEn este caso, el usuario desea consultar su dinero restante. Te daras cuenta porque su mensaje contiene frases como \"cuanta plata me queda?\" \"restante\" \"cuanto puedo gastar todavia?\"\n--------------------------------\n3. Analizar datos:\nEn este caso, el usuario desea analizar sus datos. Te daras cuenta porque el mensaje sera similar a \"quiero analizar datos\"\n--------------------------------\n--------------------------------------------------------\n\nUna vez identifiques la intencion, tu salida sera un JSON con el siguiente formato:\n\"Intencion\": \"1\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        1712
+      ],
+      "id": "2fe01c59-0a57-42dc-9ca4-7f9f1c78099d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        1936
+      ],
+      "id": "b90b5811-d45d-448c-abcf-a070b26b94c8",
+      "name": "OpenAI Chat Model5",
+      "credentials": {
+        "openAiApi": {
+          "id": "yWNwYNPotlm0AG3Y",
+          "name": "uso general"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Intencion\": \"2\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        1952
+      ],
+      "id": "c74c9eb0-ee9f-4cc4-b9c8-23db9286d2f2",
+      "name": "Structured Output Parser4"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.Intencion }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9b84e927-3861-46f6-adc1-e15ab8d74525"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "dc996088-04ab-4fcd-9b3a-4ccb03f00120",
+                    "leftValue": "={{ $json.output.Intencion }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6664e528-aaf9-4b3f-a1ab-1f66e1042889",
+                    "leftValue": "={{ $json.output.Intencion }}",
+                    "rightValue": "3",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        576,
+        1936
+      ],
+      "id": "c21c6a05-e7ea-4aae-b42c-746cc4295d51",
+      "name": "Intencion?"
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 625469355,
+          "message": {
+            "message_id": 408,
+            "from": {
+              "id": 377159859,
+              "is_bot": false,
+              "first_name": "A",
+              "username": "us86378",
+              "language_code": "es"
+            },
+            "chat": {
+              "id": 377159859,
+              "first_name": "A",
+              "username": "us86378",
+              "type": "private"
+            },
+            "date": 1758835089,
+            "text": "Si"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Extract text": {
+      "main": [
+        [
+          {
+            "node": "chatInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "consultar usuarios",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "INI usuario validado false",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "consultar usuarios1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Extract text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "audio//texto//imagen": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "obtener archivo telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "chatInput2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obtener archivo telegram": {
+      "main": [
+        [
+          {
+            "node": "discriminar al archivo de audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "discriminar al archivo de audio": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chatInput2": {
+      "main": [
+        [
+          {
+            "node": "usuario y chatInput1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chatInput": {
+      "main": [
+        [
+          {
+            "node": "usuario y chatInput2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gastos": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ingresos": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Identificar productos",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Identificar productos1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Identificar productos",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "Identificar productos1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar usuarios": {
+      "main": [
+        [
+          {
+            "node": "usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "usuario": {
+      "main": [
+        [
+          {
+            "node": "usuario existe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "usuario existe?": {
+      "main": [
+        [
+          {
+            "node": "extraer categorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "usuario y productos": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "usuario y chatInput": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "set": {
+      "main": [
+        [
+          {
+            "node": "usuario y chatInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "usuario y chatInput1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "usuario y chatInput2": {
+      "main": [
+        [
+          {
+            "node": "Identificar productos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "usuario y productos1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar usuarios1": {
+      "main": [
+        [
+          {
+            "node": "usuarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "usuario validado?": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INI usuario validado false": {
+      "main": [
+        [
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge5": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "valido este usuario?": {
+      "main": [
+        [
+          {
+            "node": "usuario validado?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "usuario validado?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "el usuario fue validado?": {
+      "main": [
+        [
+          {
+            "node": "Pedir correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge6": {
+      "main": [
+        [
+          {
+            "node": "separo cada usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "usuarios": {
+      "main": [
+        [
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "valido este usuario?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "separo cada usuario": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "usuario validado?1": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "el usuario fue validado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Pedir correo",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Pedir correo",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message in Telegram": {
+      "ai_tool": [
+        [
+          {
+            "node": "Pedir correo",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "crear carpeta": {
+      "main": [
+        [
+          {
+            "node": "Create spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Move file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move file": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Headers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Headers": {
+      "main": [
+        [
+          {
+            "node": "Delete rows or columns from sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete rows or columns from sheet": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extraer categorias": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Formatear categorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear categorias": {
+      "main": [
+        [
+          {
+            "node": "audio//texto//imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Tengo el correo?",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Aislar el correo",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Aislar el correo",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedir correo": {
+      "main": [
+        [
+          {
+            "node": "Tengo el correo?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tengo el correo?": {
+      "main": [
+        [
+          {
+            "node": "Tengo el correo?2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tengo el correo?2": {
+      "main": [
+        [
+          {
+            "node": "Aislar el correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aislar el correo": {
+      "main": [
+        [
+          {
+            "node": "crear carpeta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identificar productos": {
+      "main": [
+        [
+          {
+            "node": "usuario y productos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identificar productos1": {
+      "main": [
+        [
+          {
+            "node": "usuario y productos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Headers1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Headers1": {
+      "main": [
+        [
+          {
+            "node": "Delete rows or columns from sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete rows or columns from sheet1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge4": {
+      "main": [
+        [
+          {
+            "node": "Share file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Gastos",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Ingresos",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notificar movimientos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Notificar restante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notificar movimientos": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Agregar a contabilidad - URL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Agregar a contabilidad - URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Headers2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Headers2": {
+      "main": [
+        [
+          {
+            "node": "Delete rows or columns from sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete rows or columns from sheet2": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Intencion?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intencion?": {
+      "main": [
+        [
+          {
+            "node": "Identificar productos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a21394f5-ebde-4e92-9c14-4934cc13b751",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f40696db52f11e73af5f9bbe7ea969abc4fe61cb3ff39ed0aa6f43c52e86d29"
+  },
+  "id": "P86zoNsGPFWg1BqU",
+  "tags": []
+}
