@@ -84,5 +84,5 @@ Para comenzar a usarlo, solo hay que indicarle un correo electrónico.
 ---
 
 Te invito a comenzar a usarlo o descargar la plantilla (presente en este repositorio) y evaluarlo por tu cuenta.  
-> **Nota:** El registro puede fallar ocasionalmente.
+> **Nota:** El registro puede fallar ocasionalmente. Contactarse a alangramlichklein@gmail.com por cualquier inconveniente.
 
